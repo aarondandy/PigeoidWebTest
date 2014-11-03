@@ -1,0 +1,23 @@
+﻿@model Pigeoid.Epsg.EpsgArea
+
+@String.Concat(
+    Math.Abs(Model.LongitudeRange.Start),
+    Model.LongitudeRange.Start < 0 ? "W" : "E",
+    " to ",
+    Math.Abs(Model.LongitudeRange.End),
+    Model.LongitudeRange.End < 0 ? "W" : "E")
+;
+@String.Concat(
+    Math.Abs(Model.LatitudeRange.Low),
+    Model.LatitudeRange.Low < 0 ? "S" : "N",
+    " to ",
+    Math.Abs(Model.LatitudeRange.High),
+    Model.LatitudeRange.High < 0 ? "S" : "N")
+@if(
+    Model.LongitudeRange.Start == -180
+    && Model.LongitudeRange.End == 180
+    && Model.LatitudeRange.Low == -90
+    && Model.LatitudeRange.High == 90)
+{
+    <text>(Global)</text>
+}

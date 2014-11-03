@@ -1,0 +1,139 @@
+﻿@using Pigeoid
+@using Pigeoid.Epsg
+@using WebApp.Models
+@model EpsgOpSearchResult
+@{
+    // Layout = "/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Operation Search Results";
+    var geodeticSourceCrs = Model.SourceCrs as ICrsGeodetic;
+    var geodeticTargetCrs = Model.TargetCrs as ICrsGeodetic;
+}
+<h1>@ViewBag.Title</h1>
+<p class="lead">
+    coordinate operations from
+    @await Html.PartialAsync("_AuthorityInlinePartial", Model.SourceCrs)
+    to
+    @await Html.PartialAsync("_AuthorityInlinePartial", Model.TargetCrs)
+</p>
+
+@if(geodeticSourceCrs != null && geodeticTargetCrs != null) {
+<div class="row">
+    <div class="col-md-5">
+        @for(var inputAxisIndex = 0; inputAxisIndex < geodeticSourceCrs.Axes.Count; inputAxisIndex++)
+        {
+            var axis = geodeticSourceCrs.Axes[inputAxisIndex];
+            <div>
+                @Html.TextBox("input" + inputAxisIndex, 0)
+                @if(axis is EpsgAxis)
+                {
+                    <text>@(((EpsgAxis)axis).Unit.Name)</text>
+                }
+            </div>
+        }
+    </div>
+    <div class="col-md-2">
+        <input type="button" value="Convert" id="executeConversionButton"/>
+    </div>
+    <div class="col-md-5">
+        @for (var outputAxisIndex = 0; outputAxisIndex < geodeticTargetCrs.Axes.Count; outputAxisIndex++)
+        {
+            var axis = geodeticTargetCrs.Axes[outputAxisIndex];
+            <div>
+                @Html.TextBox("output" + outputAxisIndex, 0, new { @class="disabled", disabled="disabled"})
+                @if (axis is EpsgAxis)
+                {
+                    <text>@(((EpsgAxis)axis).Unit.Name)</text>
+                }
+            </div>
+        }
+    </div>
+</div>
+<hr />
+}
+
+
+@{
+int selectionIndex = 0;
+foreach (var path in Model.Paths)
+{
+    <div class="panel panel-default">
+        <div class="panel-heading">@path</div>
+        <div class="panel-body">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        @foreach (var crs in path.CoordinateReferenceSystems)
+                        {
+                            <td>@await Html.PartialAsync("_AuthorityInlinePartial", crs)</td>
+                        }
+                    </tr>
+                    <tr>
+                        @foreach(var op in path.CoordinateOperations)
+                        {
+                            <td>
+                                <strong>@op.Name</strong>
+                                @await Html.PartialAsync("_OpDetailsPartial", op)
+                            </td>
+                        }
+                        <td>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    selectionIndex++;
+}
+}
+
+@section Scripts {
+<script type="text/javascript">
+    $(function () {
+        var convertButton = $("#executeConversionButton");
+        var performConvert = function () {
+            var inputValues = [];
+            for (var i = 0; ; i++) {
+                var input = $("#input" + i);
+                console.log(input);
+                if (input.length !== 1) {
+                    break;
+                }
+                var value = input.val();
+                if (value == null || value == "") {
+                    value = 0;
+                }
+                else {
+                    value = parseFloat(value);
+                    if (isNaN(value)) {
+                        value = 0;
+                    }
+                }
+                inputValues[i] = value;
+            }
+            console.log("inputValues", inputValues);
+
+            $.ajax({
+                url: "@(Url.Action("OpExec"))",
+                accepts: {
+                    text: "application/json"
+                },
+                type: "GET",
+                traditional: true,
+                dataType: "json",
+                data: {
+                    sourceCrsCode: @Model.SourceCrs.Code,
+                    targetCrsCode: @Model.TargetCrs.Code,
+                    selectionIndex: 0, // TODO: add a selection from the operation down below
+                    inputValues: inputValues
+                }
+            }).done(function(coords){
+                for(var i = 0; i < coords.length; i++){
+                    $("#output"+i).val(coords[i]);
+                }
+            });
+
+        };
+        convertButton.click(performConvert);
+    });
+</script>
+}

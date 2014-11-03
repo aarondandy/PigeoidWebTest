@@ -1,0 +1,10 @@
+﻿@model Pigeoid.IAuthorityBoundEntity
+@using Pigeoid.Epsg
+@if (Model is EpsgCrs)
+{
+    <a href="@(Url.Action("Crs", "Epsg", new {id=Model.Authority.Code}))">@Model</a>
+}
+else
+{
+    <text>@Model</text>
+}

@@ -1,0 +1,31 @@
+﻿@using Pigeoid
+@using Pigeoid.CoordinateOperation
+@using Pigeoid.Epsg
+@model ICoordinateOperationInfo
+@{
+    var op = Model;
+    if (Model.IsInverseOfDefinition)
+    {
+        <div><span class="glyphicon glyphicon-random"></span> <small>inverse operation</small></div>
+        op = Model.GetInverse();
+    }
+    var parameterizedOp = op as IParameterizedCoordinateOperationInfo;
+    if (parameterizedOp != null)
+    {
+        if (parameterizedOp.Method != null)
+        {
+            <div>@parameterizedOp.Method</div>
+        }
+        if (parameterizedOp.Parameters.Any())
+        {
+            <div class="well">
+                <ul>
+                @foreach (var parameter in parameterizedOp.Parameters)
+                {
+                    <li>@parameter.Name: @parameter.Value @parameter.Unit</li>
+                }
+                </ul>
+            </div>
+        }
+    }
+}

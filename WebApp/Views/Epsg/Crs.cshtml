@@ -1,15 +1,55 @@
-﻿@model Pigeoid.Epsg.EpsgCrs
+﻿@using Pigeoid.Epsg
+@model EpsgCrs
 @{
-// Layout = "/Views/Shared/_Layout.cshtml";
-// ViewBag.Title = "Home Page";
+    ViewBag.Title = "CRS: " + Model.Name;
+    var geodetic = Model as EpsgCrsGeodetic;
 }
 <h1>@Model.Name <small>@Model.Authority</small></h1>
-
-<table>
+<table class="table">
     <tbody>
         <tr>
-            <th>Area of Use</th><td>@Model.</td>
+            <th>Area of Use</th><td>@await Html.PartialAsync("_AreaInlinePartial", Model.Area)</td>
         </tr>
+        <tr>
+            <th>Authority</th><td>@await Html.PartialAsync("_AuthorityInlinePartial", Model)</td>
+        </tr>
+        <tr>
+            <th>Deprecated</th><td>@Model.Deprecated</td>
+        </tr>
+        <tr>
+            <th>Kind</th><td>@Model.Kind</td>
+        </tr>
+        @if(geodetic != null)
+        {
+            <tr>
+                <th>Axes</th><td>@await Html.PartialAsync("_AxesListPartial",geodetic.Axes)</td>
+            </tr>
+            @if (geodetic.BaseCrs != null)
+            {
+            <tr>
+                <th>Base</th><td>@await Html.PartialAsync("_EpsgCrsInlinePartial", geodetic.BaseCrs)</td>
+            </tr>
+            }
+            <tr>
+                <th>Coordinate System</th><td>@geodetic.CoordinateSystem.Name</td>
+            </tr>
+            <tr>
+                <th>Datum</th><td>@geodetic.GeodeticDatum.Name</td>
+            </tr>
+            <tr>
+                <th>General Unit</th><td>@geodetic.Unit</td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<h2>Conversion</h2>
+@using (Html.BeginForm("opsearch", "Epsg", FormMethod.Get, new { @class="form"}))
+{
+    @Html.Hidden("sourceCrsCode", Model.Code)
+    <div>
+        From @await Html.PartialAsync("_AuthorityInlinePartial", Model) to EPSG CRS Code: @Html.TextBox("targetCrsCode",4326)
+        <input type="submit" value="Search"/>
+    </div>
+}
 

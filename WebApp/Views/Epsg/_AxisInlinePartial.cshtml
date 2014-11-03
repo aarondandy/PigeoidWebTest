@@ -1,0 +1,14 @@
+﻿@using Pigeoid
+@using Pigeoid.Epsg
+@model IAxis
+@{
+    <text>@Model.Name</text>
+    if (Model is EpsgAxis)
+    {
+        var unit = ((EpsgAxis)Model).Unit;
+        if (unit != null)
+        {
+            <text>, @unit.Name</text>
+        }
+    }
+}

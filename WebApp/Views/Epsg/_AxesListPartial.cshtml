@@ -1,0 +1,16 @@
+﻿@using Pigeoid
+@using Pigeoid.Epsg
+@model IAxis[]
+@if (Model == null || Model.Length == 0)
+{
+    <text>no axes</text>
+}
+else
+{
+    <ol>
+    @foreach(var axis in Model)
+    {
+        <li>@await Html.PartialAsync("_AxisInlinePartial", axis)</li>
+    }
+    </ol>
+}

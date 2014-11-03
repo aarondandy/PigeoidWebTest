@@ -1,0 +1,19 @@
+﻿@using Pigeoid.Epsg
+@using WebApp.Models
+@model EpsgIndex
+@{
+    ViewBag.Title = "Pigeoid.EPSG Web Test Area";
+}
+<h1>@ViewBag.Title</h1>
+<h2>CRS Listing</h2>
+<table class="table">
+    <tr>
+        <th>Name</th><th>Authority</th>
+    </tr>
+    @foreach(var crs in Model.MicroDb.GetAllCrs())
+    {
+        <tr>
+            <td>@crs.Name</td><td>@await Html.PartialAsync("_AuthorityInlinePartial", crs)</td>
+        </tr>
+    }
+</table>
