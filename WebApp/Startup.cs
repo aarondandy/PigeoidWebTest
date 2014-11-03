@@ -23,20 +23,6 @@ namespace WebApp
             // Set up application services
             app.UseServices(services =>
             {
-                // Add EF services to the services container
-                services.AddEntityFramework()
-                    .AddSqlServer();
-
-                // Configure DbContext
-                services.SetupOptions<DbContextOptions>(options =>
-                {
-                    options.UseSqlServer(configuration.Get("Data:DefaultConnection:ConnectionString"));
-                });
-                
-                // Add Identity services to the services container
-                services.AddIdentitySqlServer<ApplicationDbContext, ApplicationUser>()
-                    .AddAuthentication();
-
                 // Add MVC services to the services container
                 services.AddMvc();
             });
