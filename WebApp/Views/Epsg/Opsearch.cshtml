@@ -57,7 +57,7 @@ int selectionIndex = 0;
 foreach (var path in Model.Paths)
 {
     <div class="panel panel-default">
-        <div class="panel-heading">@path</div>
+        <div class="panel-heading"><input type="button" value="@selectionIndex" class="selectPathButton"/> @path</div>
         <div class="panel-body">
             <table class="table">
                 <tbody>
@@ -90,6 +90,7 @@ foreach (var path in Model.Paths)
 <script type="text/javascript">
     $(function () {
         var convertButton = $("#executeConversionButton");
+        var convertIndex = 0;
         var performConvert = function () {
             var inputValues = [];
             for (var i = 0; ; i++) {
@@ -123,7 +124,7 @@ foreach (var path in Model.Paths)
                 data: {
                     sourceCrsCode: @Model.SourceCrs.Code,
                     targetCrsCode: @Model.TargetCrs.Code,
-                    selectionIndex: 0, // TODO: add a selection from the operation down below
+                    selectionIndex: convertIndex, // TODO: add a selection from the operation down below
                     inputValues: inputValues
                 }
             }).done(function(coords){
@@ -134,6 +135,10 @@ foreach (var path in Model.Paths)
 
         };
         convertButton.click(performConvert);
+
+        $(".selectPathButton").click(function(b){
+            convertIndex = parseInt(b.target.value, 10);
+        });
     });
 </script>
 }
